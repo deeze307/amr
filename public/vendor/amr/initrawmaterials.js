@@ -1,0 +1,1 @@
+app.controller("initRawMaterialController",["$scope","$http",function(t,o){}]);

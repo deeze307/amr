@@ -1,0 +1,1 @@
+phpdoc/vendor/bin/phpdoc -d "..\app\Http\Controllers" -t "Amr_xml" --template="xml"
