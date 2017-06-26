@@ -26,7 +26,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'mysql'),
+    'default' => env('DB_CONNECTION', 'amr_prod'),
 
     /*
     |--------------------------------------------------------------------------
@@ -226,9 +226,9 @@ return [
 
         'amr_prod' => [
             'driver'    => 'mysql',
-            'host'      => env('AMR_HOST', '10.30.10.97'),
+            'host'      => env('AMR_HOST', '10.30.10.44'),
             'database'  => env('AMR_DATABASE', 'cgs_interface_db'),
-            'username'  => env('AMR_USERNAME', 'jmc'),
+            'username'  => env('AMR_USERNAME', 'amr'),
             'password'  => env('AMR_PASSWORD', 'apisql'),
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
@@ -238,9 +238,9 @@ return [
 
         'amr_prod_desa' => [
             'driver'    => 'mysql',
-            'host'      => env('AMRDESA_HOST', '10.30.10.97'),
+            'host'      => env('AMRDESA_HOST', '10.30.10.44'),
             'database'  => env('AMRDESA_DATABASE', 'cgs_interface_db_desa'),
-            'username'  => env('AMRDESA_USERNAME', 'jmc'),
+            'username'  => env('AMRDESA_USERNAME', 'amr'),
             'password'  => env('AMRDESA_PASSWORD', 'apisql'),
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
@@ -250,9 +250,9 @@ return [
 
         'db2_tools' => [
             'driver'    => 'mysql',
-            'host'      => env('DB2TOOLS_HOST', '10.30.10.97'),
+            'host'      => env('DB2TOOLS_HOST', '10.30.10.44'),
             'database'  => env('DB2TOOLS_DATABASE', 'db2_tools'),
-            'username'  => env('DB2TOOLS_USERNAME', 'jmc'),
+            'username'  => env('DB2TOOLS_USERNAME', 'amr'),
             'password'  => env('DB2TOOLS_PASSWORD', 'apisql'),
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
