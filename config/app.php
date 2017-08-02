@@ -208,6 +208,7 @@ return [
 
         'Entrust'   => Zizaco\Entrust\EntrustFacade::class,
 		'SoapWrapper' => Artisaninweb\SoapWrapper\Facades\SoapWrapper::class,
+        'SoapClient'=> SoapClient::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
 
         //'Debugbar' => Barryvdh\Debugbar\Facade::class
