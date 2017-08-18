@@ -1,0 +1,1 @@
+app.controller("pizarraController",["$scope","$http",function(o,r){}]);

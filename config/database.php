@@ -26,7 +26,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'amr_prod'),
+    'default' => env('DB_CONNECTION', 'iaserver'),
 
     /*
     |--------------------------------------------------------------------------
@@ -124,60 +124,12 @@ return [
             'strict'    => false,
         ],
 
-        'calidad' => [
-            'driver'    => 'mysql',
-            'host'      => env('IA_HOST', 'ARUS3DB19'),
-            'database'  => env('IA_DATABASE', ''),
-            'username'  => env('IA_USERNAME', ''),
-            'password'  => env('IA_PASSWORD', ''),
-            'charset'   => 'utf8',
-            'collation' => 'utf8_unicode_ci',
-            'prefix'    => '',
-            'strict'    => false,
-        ],
-
         'pizarra' => [
             'driver'    => 'sqlsrv',
             'host'      => env('PIZARRA_HOST', '10.30.10.94'),
             'database'  => env('PIZARRA_DATABASE', 'pizarra'),
             'username'  => env('PIZARRA_USERNAME', 'pizarra'),
             'password'  => env('PIZARRA_PASSWORD', 'Manzana2012'),
-            'charset'   => 'utf8',
-            'collation' => 'utf8_unicode_ci',
-            'prefix'    => '',
-            'strict'    => false,
-        ],
-
-        'molinete' => [
-            'driver'    => 'sqlsrv',
-            'host'      => env('MOLINETE_HOST', 'ARUS3DB16'),
-            'database'  => env('MOLINETE_DATABASE', 'Ctrl_Estatica'),
-            'username'  => env('MOLINETE_USERNAME', 's-estatica'),
-            'password'  => env('MOLINETE_PASSWORD', 'Passw0rd'),
-            'charset'   => 'utf8',
-            'collation' => 'utf8_unicode_ci',
-            'prefix'    => '',
-            'strict'    => false,
-        ],
-
-        'm77' => [
-            'driver'    => 'mysql',
-            'host'      => env('M77_HOST', '10.30.51.150'),
-            'database'  => env('M77_DATABASE', 'aoidata_backdata'),
-            'username'  => env('M77_USERNAME', 'root'),
-            'password'  => env('M77_PASSWORD', ''),
-            'charset'   => 'utf8',
-            'collation' => 'utf8_unicode_ci',
-            'prefix'    => '',
-            'strict'    => false,
-        ],
-
-        'proevo' => [
-            'driver'    => 'mysql',
-            'host'      => env('PRO_HOST', '10.30.51.51'),
-            'database'  => env('PRO_DATABASE', 'proevo'),
-            'username'  => env('PRO_USERNAME', 'proevo'),
-            'password'  => env('PRO_PASSWORD', 'apisql'),
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
@@ -278,29 +230,6 @@ return [
             'password' => env('COGISCANDEV_PASSWORD', 'Passw0rd'),
             'charset'  => 'utf8',
             'prefix'   => '',
-        ],
-
-        'pgsql' => [
-            'driver'   => 'pgsql',
-            'host'     => env('DB_HOST', 'localhost'),
-            'database' => env('DB_DATABASE', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
-            'password' => env('DB_PASSWORD', ''),
-            'charset'  => 'utf8',
-            'prefix'   => '',
-            'schema'   => 'public',
-        ],
-
-        'npmpicker' => [
-            'driver'   => 'mysql',
-            'host'     => env('NPMPICKER_HOST', '10.30.10.22'),
-            'database' => env('NPMPICKER_DATABASE', 'npmpicker'),
-            'username' => env('NPMPICKER_USERNAME', 'npmpicker'),
-            'password' => env('NPMPICKER_PASSWORD', 'npmpicker'),
-            'charset'  => 'utf8',
-            'collation' => 'utf8_unicode_ci',
-            'prefix'   => '',
-            'schema'   => 'public',
         ],
     ],
 

@@ -9,7 +9,6 @@ use Zizaco\Entrust\Traits\EntrustUserTrait;
 class User extends Authenticatable
 {
     use EntrustUserTrait; //hacemos uso del trait en la clase User para hacer uso de sus métodos
-	
     protected $fillable = [
         'name', 'password'
     ];

@@ -42,4 +42,8 @@ elixir(function(mix) {
         "resources/views/config/assets/js",
         "public/vendor/amr/config.js"
     );
+    mix.scriptsIn(
+        "resources/views/pizarra/assets/js",
+        "public/vendor/amr/pizarra.js"
+    );
 });

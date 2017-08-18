@@ -814,6 +814,7 @@ return array(
     'IAServer\\Http\\Controllers\\PedidoXPull\\Model\\pedido' => $baseDir . '/app/Http/Controllers/PedidosXPull/Model/pedido.php',
     'IAServer\\Http\\Controllers\\PedidoXPull\\Model\\usuario' => $baseDir . '/app/Http/Controllers/PedidosXPull/Model/usuario.php',
     'IAServer\\Http\\Controllers\\PedidoXPull\\controllerPedido' => $baseDir . '/app/Http/Controllers/PedidosXPull/controllerPedido.php',
+    'IAServer\\Http\\Controllers\\PizarraDeProduccion\\PizarraController' => $baseDir . '/app/Http/Controllers/PizarraDeProduccion/PizarraController.php',
     'IAServer\\Http\\Controllers\\Redis\\RedisCached' => $baseDir . '/app/Http/Controllers/Redis/RedisCached.php',
     'IAServer\\Http\\Controllers\\Redis\\RedisController' => $baseDir . '/app/Http/Controllers/Redis/RedisController.php',
     'IAServer\\Http\\Controllers\\ValidarLinea\\CRUDValidate' => $baseDir . '/app/Http/Controllers/LoadControl/CRUDLoad.php',

@@ -35,14 +35,14 @@
                                         <span class="info-box-icon"><i class="fa fa-clock-o"></i></span>
                                         <div class="info-box-content">
                                             <span class="info-box-text">Intervalo de tiempo (minutos)</span>
-                                    <span class="info-box-number">
-                                        <span>1</span>
-                                        <input id="SliderAMR" ng-model="sliderValAMR" data-slider-id='red' type="text" data-slider-min="1" data-slider-max="45" data-slider-step="1" data-slider-value='30' />
-                                        <span>45</span>
-                                    </span>
-                                <span class="progress-description">
-                                  <span id="ex6CurrentSliderValLabelAMR">Intervalo Actual de Tiempo para AMR: <strong><span id="ex6SliderValAMR" ng-bind="sliderValAMR"></span></strong></span>
-                                </span>
+                                            <span class="info-box-number">
+                                            <span>1</span>
+                                            <input id="SliderAMR" ng-model="sliderValAMR" data-slider-id='red' type="text" data-slider-min="1" data-slider-max="45" data-slider-step="1" data-slider-value='30' />
+                                            <span>45</span>
+                                            </span>
+                                            <span class="progress-description">
+                                              <span id="ex6CurrentSliderValLabelAMR">Intervalo Actual de Tiempo para AMR: <strong><span id="ex6SliderValAMR" ng-bind="sliderValAMR"></span></strong></span>
+                                            </span>
                                         </div><!-- /.info-box-content -->
                                     </div><!-- /.info-box -->
                                 </div>
