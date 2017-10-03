@@ -31,7 +31,7 @@ class IAServerController extends Controller
 
     public static function IAServerMenu()
     {
-        $all_menu = Menu::orderBy('titulo','asc')->get();
+        $all_menu = Menu::where('enabled','true')->orderBy('titulo','asc')->get();
 
         $root = array();
         foreach($all_menu as $menu)
