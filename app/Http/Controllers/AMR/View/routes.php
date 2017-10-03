@@ -39,7 +39,7 @@ function(){
         ]);
 
         Route::get('/todos',[
-            'as'=>'amr.pedidos.nuevos.todos',
+            'as'=>'amr.pedidos.parciales.todos',
             'uses' => 'Partials@getPartialsOnInterface'
         ]);
     });
