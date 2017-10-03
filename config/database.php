@@ -100,6 +100,18 @@ return [
             'strict'    => false,
         ],
 
+        'smtdatabase' => [
+            'driver'    => 'mysql',
+            'host'      => env('SMTDATABASE_HOST', '10.30.10.22'),
+            'database'  => env('SMTDATABASE_DATABASE', 'smtdatabase'),
+            'username'  => env('SMTDATABASE_USERNAME', 'root'),
+            'password'  => env('SMTDATABASE_PASSWORD', 'apisql'),
+            'charset'   => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'prefix'    => '',
+            'strict'    => false,
+        ],
+
         'inventario' => [
             'driver'    => 'mysql',
             'host'      => env('INVENTARIO_HOST', '10.30.10.22'),

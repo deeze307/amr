@@ -51,3 +51,7 @@ Route::get('/requests/initamrcicle',[
 Route::get('/documentacion', ['as' =>'amr.documentacion', 'uses' => 'AMR\Documentacion\Documentacion@index']);
 
 //*******************//
+
+// Rutas de vistas
+
+require('View/routes.php');

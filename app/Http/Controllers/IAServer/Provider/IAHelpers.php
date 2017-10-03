@@ -89,6 +89,10 @@ function isInventoryOper()
 {
     return hasRole('inventario_operador');
 }
+function isMaterialsManager()
+{
+    return hasRole('cogiscan_materialista');
+}
 
 function dateToEs($date)
 {

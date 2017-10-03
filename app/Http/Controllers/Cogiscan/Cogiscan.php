@@ -114,6 +114,21 @@ class Cogiscan extends Controller
 
         return $cmd->result();
     }
+
+    public function queryPartNumber($partNumber)
+    {
+        $param = [
+            'queryPartNumber',
+            '<Parameters>
+                <Parameter name="itemTypeClass">Component Lot</Parameter>
+                <Parameter name="partNumber">'.$partNumber.'</Parameter>
+            </Parameters>
+        '];
+
+        $cmd = new CogiscanCommand($param);
+
+        return $cmd->result();
+    }
     public function releaseProduct($modelo,$route,$op,$sn1,$sn2)
     {
 

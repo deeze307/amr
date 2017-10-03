@@ -1,0 +1,1 @@
+app.controller("pedidosParcialesController",["$scope","$http","pedidosParcialesFactory","toasty","$log",function(t,a,o,r,e){o.getPartials().then(function(a){e.log(a.data),t.pedidosParciales=a.data})}]),app.factory("pedidosParcialesFactory",["$http","$location",function(t,a){a.absUrl();return{getPartials:function(){return t.get("parciales/todos")}}}]);

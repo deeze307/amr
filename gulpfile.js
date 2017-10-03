@@ -42,6 +42,36 @@ elixir(function(mix) {
         "resources/views/config/assets/js",
         "public/vendor/amr/config.js"
     );
+
+    mix.scriptsIn(
+        "resources/views/amr/pedidosNuevos/assets/js",
+        "public/vendor/amr/pedidosNuevos.js"
+    );
+
+    mix.scriptsIn(
+        "resources/views/amr/pedidosProcesados/assets/js",
+        "public/vendor/amr/pedidosProcesados.js"
+    );
+
+    mix.scriptsIn(
+        "resources/views/amr/pedidosParciales/assets/js",
+        "public/vendor/amr/pedidosParciales.js"
+    );
+
+    // *** RESERVAS *** //
+
+    mix.scriptsIn(
+        "resources/views/amr/reservas/assets/js",
+        "public/vendor/amr/reservas.js"
+    );
+
+    // **************** //
+
+    mix.scriptsIn(
+        "resources/views/amr/trazabilidad/assets/js",
+        "public/vendor/amr/trazabilidad.js"
+    );
+
     mix.scriptsIn(
         "resources/views/pizarra/assets/js",
         "public/vendor/amr/pizarra.js"

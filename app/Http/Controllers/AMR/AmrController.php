@@ -112,9 +112,10 @@ class AmrController extends Controller
         {
             try
             {
+                // Si la cantidad de low levels es 1, entro a un nivel diferente al nivel si tuviera más de un material
                 if (count($materiales['PartLowWarning']) > 1)
                 { $mat = $mat['attributes'];}
-                if (!$mat['remainingBoards'] == '0')
+                if ($mat['remainingBoards'] != '0')
                 {
 
                     $matArray = new \stdClass();
@@ -231,14 +232,21 @@ class AmrController extends Controller
 
     private static function qtyToRequest($line,$qtyPerLocation,$remainingBoards,$batchId,$partNumber)
     {
-        $pizarra = CrudAmr::getLastReportFromPizarra($line);
-
+        $pizarra_dev = CrudAmr::getExpectedProdFromPizarra($batchId,$line);
         //Obtengo la secuencia de Operacion
         $opSeq = CrudAmr::getOperationSeq($batchId);
         $operationSeq = $opSeq->OPERATION_SEQ_NUM;
 
         //Cantidad que debería usar en 3 horas de producción
-        $shouldUse = ($qtyPerLocation * $pizarra->proyectado) * 3;
+        // Si no está configurado el reporte en
+        if (!isset($pizarra_dev->paneles_hora))
+        {
+            $output = new ConsoleOutput();
+            $output->writeln('<fg=magenta> Orden de Producción </> '.$batchId.' <fg=magenta>para linea  </> '.$line.' <fg=magenta> No Existe en Pizarra  </>');
+            $pizarra_dev = new \stdClass();
+            $pizarra_dev->paneles_hora = 50;
+        }
+        $shouldUse = ($qtyPerLocation * $pizarra_dev->paneles_hora) * 3;
 
         //Cantidad disponible para pedir en la OP
         $cogiscan_wip = CrudAmr::chkAvailableQtyToRequest($batchId,$partNumber);
@@ -274,7 +282,7 @@ class AmrController extends Controller
             $delta = CrudAmr::chkDeltaMonitor($material);
 
             //Cantidad de registros en delta monitor para insertar en MaterialRequest e Interfaz
-            if(count($delta) < 10)
+            if(count($delta) < 5)
             {
                 if(count($delta) != 0)
                 {
@@ -309,10 +317,10 @@ class AmrController extends Controller
                     $material->ubicacionOrigen = "";
                     switch($onFloor){
                         case 0:
-                            $material->ubicacionOrigen = 0;
+                            $material->ubicacionOrigen = 0; // Hay un Pedido procesado que aún no ha llegado
                             break;
                         case 1:
-                            $material->ubicacionOrigen = 1;
+                            $material->ubicacionOrigen = 1; //
                             break;
                         case 2:
                             $material->ubicacionOrigen = 2;
@@ -339,7 +347,7 @@ class AmrController extends Controller
     /**
      * Chequea si el material solicitado se encuentra en piso de produccion y no tiene pedidos esperando a ser entregados
      * @param $material
-     * @return int
+     * @return boolean
      */
     private static function onFloor($material)
     {

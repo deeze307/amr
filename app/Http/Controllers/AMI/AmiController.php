@@ -35,7 +35,21 @@ class AmiController extends Controller
         {
             $cogiscan = new Cogiscan();
             try{
-                $init = $cogiscan->initializeRawMaterial($pedido->LPN,$pedido->ITEM_CODE,'1','REEL',$pedido->QUANTITY_ASSIGNED);
+                // Si los campos máquina y ubicación están vacios es porque es una asignación por PULL
+                // y tengo que invertir los campos QUANTITY_ASSIGNED y LPN_QUANTITY
+                if(empty($pedido->MAQUINA))
+                {
+                    $qty = $pedido->QUANTITY_ASSIGNED;
+                }
+                else
+                {
+                    $qty = $pedido->LPN_QUANTITY;
+                }
+
+                //consulto información de P# antes de inicializar para saber el tipo de material y el MSL
+                $partNumber = self::queryPartNumber($pedido->ITEM_CODE);
+
+                $init = $cogiscan->initializeRawMaterial($pedido->LPN,$pedido->ITEM_CODE,'1',$partNumber->containerType,$qty);
             }
             catch (Exception $ex){
                 Log::error('Ocurrió un error al inicializar el material '.$pedido->LPN .' | '.$ex->getMessage());
@@ -68,12 +82,23 @@ class AmiController extends Controller
                 $data = new mySql_Materiales();
                 $data->part_number= $pedido->ITEM_CODE;
                 $data->prod_line = $pedido->PROD_LINE;
-                $data->quantity= $pedido->QUANTITY_ASSIGNED;
+
+                // Checkeo si la asignación se hizo a travéz del AMR o por PULL
+                // Si los campos máquina y ubicación están vacios, es porque es una asignacíon por PULL
+                // y tengo que invertir los campos QUANTITY_ASSIGNED y LPN_QUANTITY
+                if(empty($pedido->MAQUINA))
+                {
+                    $data->quantity= $pedido->QUANTITY_ASSIGNED;
+                }
+                else
+                {
+                    $data->quantity= $pedido->LPN_QUANTITY;
+                }
+
                 $data->op_number = $pedido->OP_NUMBER;
                 $data->lpn = $pedido->LPN;
                 $data->creation_date = $pedido->CREATION_DATE;
                 $data->save();
-                //Log::info('Material '. $pedido->LPN .' inicializado e insertado en la base de datos');
 
                 //Update en SQL XXE_WMS_COGISCAN_PEDIDO_LPNS
                 self::updateRequestOnSQL($pedido);
@@ -102,6 +127,48 @@ class AmiController extends Controller
         $consulta = self::paginado($arr);
         $total = self::total($arr);
         return view('initrawmaterials.reporte',["items"=>$consulta,"total"=>$total]);
+    }
+
+    //Obtengo la información de un part number
+    public static function queryPartNumber($partNumber)
+    {
+        $cogiscan = new Cogiscan();
+        $part = new \stdClass();
+        $ws = $cogiscan->queryPartNumber($partNumber);
+        $part->containerType = 'REEL';
+        if (!isset($ws['attributes']['message']))
+        {
+            try
+            {
+                foreach($ws['ItemTypeList']['ItemType'] as $key => $type)
+                {
+                    if(isset($type['attributes']))
+                    {
+                        if ($type['attributes']['name'] == 'TRAY')
+                        {
+                            $part->containerType = 'TRAY';
+                            Log::debug('elemento '.$partNumber.' es tray');
+                        }
+                    }
+                    else
+                    {
+                        if ($type['name'] == 'TRAY')
+                        {
+                            $part->containerType = 'TRAY';
+                            Log::debug('elemento '.$partNumber.' es tray');
+                        }
+                    }
+
+                }
+            }
+            catch (Exception $ex)
+            {
+
+            }
+
+        }
+
+        return $part;
     }
 
     private function total($arr)

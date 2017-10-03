@@ -7,6 +7,7 @@ use IAServer\Http\Controllers\AMR\Model\DeltaMonitor;
 use IAServer\Http\Controllers\AMR\Model\HeartBeat;
 use IAServer\Http\Controllers\AMR\Model\MaterialRequest;
 use IAServer\Http\Controllers\AMR\Model\PIZARRA_DBO_PRODUCCION;
+use IAServer\Http\Controllers\AMR\Model\SmtDataBase;
 use IAServer\Http\Controllers\AMR\Model\XXE_WMS_COGISCAN_PEDIDOS;
 use IAServer\Http\Controllers\AMR\Model\XXE_WMS_COGISCAN_WIP;
 use IAServer\Http\Controllers\Email\Email;
@@ -172,8 +173,9 @@ class CrudAmr extends Controller
         $toReturn = false;
         try
         {
-            $lastInsertId = XXE_WMS_COGISCAN_PEDIDOS::WHERE('ITEM_CODE',$material)
-                ->WHERE('PROD_LINE',$line)
+            $lastInsertId = XXE_WMS_COGISCAN_PEDIDOS::where('ITEM_CODE',$material)
+                ->where('PROD_LINE',$line)
+                ->whereNotNull('LAST_UPDATE_DATE')
                 ->orderBy('LINEA_ID','DESC')->first();
 //            if ( count($lastInsertId ) == 0)
 //            {
@@ -254,6 +256,16 @@ class CrudAmr extends Controller
             ->where('anio',Carbon::now()->format('Y'))
             ->whereNotNull('proyectado')
             ->orderBy('id','desc')->first();
+    }
+
+    public static function getExpectedProdFromPizarra($batchId,$line)
+    {
+        $smtdatabase = SmtDataBase::where('op',$batchId)->first();
+
+        return PIZARRA_DBO_PRODUCCION::from('dbo.panel')->select('paneles_hora')
+            ->where('modelo',$smtdatabase->modelo)
+            ->where('panel',$smtdatabase->panel)
+            ->where('id_linea',$line)->first();
     }
 
     public static function requiredInCgsWip($batchId,$partNumber)
