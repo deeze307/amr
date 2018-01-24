@@ -28,8 +28,8 @@ return [
     |
     */
 
-    'host' => env('MAIL_HOST', 'smtp.mailgun.org'),
-
+//    'host' => env('MAIL_HOST', 'smtp.mailgun.org'),
+    'host' => env('MAIL_HOST', 'relayush.nwsn.local'),
     /*
     |--------------------------------------------------------------------------
     | SMTP Host Port
@@ -41,7 +41,8 @@ return [
     |
     */
 
-    'port' => env('MAIL_PORT', 587),
+//    'port' => env('MAIL_PORT', 587),
+    'port' => env('MAIL_PORT', 25),
 
     /*
     |--------------------------------------------------------------------------
@@ -54,8 +55,8 @@ return [
     |
     */
 
-    'from' => ['address' => env('MAIL_ADDRESS', null), 'name' => env('MAIL_NAME', null)],
-
+//    'from' => ['address' => env('MAIL_ADDRESS', null), 'name' => env('MAIL_NAME', null)],
+    'from' => ['address' => 'aoi.collector@newsan.com.ar', 'name' => 'AOICollector'],
     /*
     |--------------------------------------------------------------------------
     | E-Mail Encryption Protocol
@@ -80,8 +81,8 @@ return [
     |
     */
 
-    'username' => env('MAIL_USERNAME'),
-
+//    'username' => env('MAIL_USERNAME'),
+    'username' => 'aoi.collector@newsan.com.ar',
     /*
     |--------------------------------------------------------------------------
     | SMTP Server Password
@@ -93,8 +94,8 @@ return [
     |
     */
 
-    'password' => env('MAIL_PASSWORD'),
-
+//    'password' => env('MAIL_PASSWORD'),
+    'password' => 'Newsan00',
     /*
     |--------------------------------------------------------------------------
     | Sendmail System Path

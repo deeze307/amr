@@ -65,10 +65,7 @@ class AmiController extends Controller
                     Log::error('Ocurrió un error al Cargar el material '.$pedido->LPN .' a la ubicación DEFAULTSTORAGE | '.$ex2->getMessage());
                 }
             }
-            else
-            {
-                Log::warning('material '. $pedido->LPN .' ya se encuentra inicializado.');
-            }
+
             self::insertData($pedido);
         }
     }
@@ -86,14 +83,15 @@ class AmiController extends Controller
                 // Checkeo si la asignación se hizo a travéz del AMR o por PULL
                 // Si los campos máquina y ubicación están vacios, es porque es una asignacíon por PULL
                 // y tengo que invertir los campos QUANTITY_ASSIGNED y LPN_QUANTITY
-                if(empty($pedido->MAQUINA))
-                {
-                    $data->quantity= $pedido->QUANTITY_ASSIGNED;
-                }
-                else
-                {
-                    $data->quantity= $pedido->LPN_QUANTITY;
-                }
+//                if(empty($pedido->MAQUINA))
+//                {
+//                    $data->quantity= $pedido->QUANTITY_ASSIGNED;
+//                }
+//                else
+//                {
+//                    $data->quantity= $pedido->LPN_QUANTITY;
+//                }
+                $data->quantity = $pedido->QUANTITY_ASSIGNED;
 
                 $data->op_number = $pedido->OP_NUMBER;
                 $data->lpn = $pedido->LPN;
@@ -106,10 +104,7 @@ class AmiController extends Controller
                 Log::error('Ocurrió un error al intentar insertar el material '. $pedido->LPN .' en la base de datos');
             }
         }
-        else
-        {
-            Log::info('Material '. $pedido->LPN .' inicializado en Cogiscan, pero ya se encuentra en la base de datos');
-        }
+
     }
 
     private static function updateRequestOnSQL($pedido)
@@ -147,7 +142,6 @@ class AmiController extends Controller
                         if ($type['attributes']['name'] == 'TRAY')
                         {
                             $part->containerType = 'TRAY';
-                            Log::debug('elemento '.$partNumber.' es tray');
                         }
                     }
                     else
@@ -155,7 +149,6 @@ class AmiController extends Controller
                         if ($type['name'] == 'TRAY')
                         {
                             $part->containerType = 'TRAY';
-                            Log::debug('elemento '.$partNumber.' es tray');
                         }
                     }
 

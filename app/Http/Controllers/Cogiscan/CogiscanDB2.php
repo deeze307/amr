@@ -271,6 +271,15 @@ class CogiscanDB2 extends Controller
 
     public function opByComplexTool($complexId)
     {
+        $arr = new \stdClass();
+
+//        $arr->item_id = '';
+//        $arr->op = '';
+//        $arr->semielaborado = '';
+//        $arr->cantidad_inicial = '';
+//        $arr->cantidad_completada = '';
+//        $arr->descripcion = '';
+
         if($complexId ==="all"){
             $query = "SELECT pb.BATCH_ID,ii.ITEM_ID FROM CGSPCM.PRODUCT p
                   LEFT JOIN cgs.ITEM_INFO ii ON ii.ITEM_KEY = p.TOOL_KEY
@@ -284,32 +293,35 @@ class CogiscanDB2 extends Controller
                   ORDER BY p.LAST_STATUS_CHANGE_TMST LIMIT 1";
         }
         $query = self::query($query);
-        $semielaborado = XXE_WIP_OT::select('WIP_ENTITY_NAME','START_QUANTITY','QUANTITY_COMPLETED','SEGMENT1','DESCRIPTION')
-                        ->WHERE('WIP_ENTITY_NAME',$query[0]->BATCH_ID)->first();
-        $arr = new \stdClass();
-        if (count($semielaborado) > 0)
+        if(count($query) > 0)
         {
-            $arr->item_id = $query[0]->ITEM_ID;
-            $arr->op = $query[0]->BATCH_ID;
-            $arr->semielaborado = $semielaborado->SEGMENT1;
-            $arr->cantidad_inicial = $semielaborado->START_QUANTITY;
-            $arr->cantidad_completada = $semielaborado->QUANTITY_COMPLETED;
-            $arr->descripcion = $semielaborado->DESCRIPTION;
-        }
-        else
-        {
-            $arr->item_id = $query[0]->ITEM_ID;
-            $arr->op = $query[0]->BATCH_ID;
-            $arr->semielaborado = "";
-            $arr->cantidad_inicial = "";
-            $arr->cantidad_completada = "";
-            $arr->descripcion = "";
+            $semielaborado = XXE_WIP_OT::select('WIP_ENTITY_NAME','START_QUANTITY','QUANTITY_COMPLETED','SEGMENT1','DESCRIPTION')
+                ->WHERE('WIP_ENTITY_NAME',$query[0]->BATCH_ID)->first();
+
+            if (count($semielaborado) > 0)
+            {
+                $arr->item_id = $query[0]->ITEM_ID;
+                $arr->op = $query[0]->BATCH_ID;
+                $arr->semielaborado = $semielaborado->SEGMENT1;
+                $arr->cantidad_inicial = $semielaborado->START_QUANTITY;
+                $arr->cantidad_completada = $semielaborado->QUANTITY_COMPLETED;
+                $arr->descripcion = $semielaborado->DESCRIPTION;
+            }
+            else
+            {
+                $arr->item_id = $query[0]->ITEM_ID;
+                $arr->op = $query[0]->BATCH_ID;
+                $arr->semielaborado = "";
+                $arr->cantidad_inicial = "";
+                $arr->cantidad_completada = "";
+                $arr->descripcion = "";
+            }
         }
 
         return $arr;
     }
 
-    public function getFromAlmIA($partNumber="")
+    public function getFromAlmIA($partNumber="",$notEqualTo=[])
     {
         $query="SELECT ITEM_KEY,ITEM_ID,PART_NUMBER,QUANTITY,CNTR_KEY,LOCATION_IN_CNTR,INIT_TMST,LAST_LOAD_TMST,QUARANTINE_LOCKED,LOAD_USER_ID
                 FROM CGS.ITEM_INFO
@@ -318,11 +330,20 @@ class CogiscanDB2 extends Controller
         {
             $query = "$query AND PART_NUMBER = '$partNumber'";
         }
+        if(count($notEqualTo) > 0)
+        {
+            foreach ($notEqualTo as $key=>$item)
+            {
+                $query = "$query AND ITEM_ID <> '$item->lpn'";
+            }
+        }
+
+        $query = "$query FETCH FIRST 1 ROWS ONLY";
 
         return self::query($query);
     }
 
-    public function getFromTransitIA($partNumber="",$prod_line="")
+    public function getFromTransitIA($partNumber="",$prod_line="",$notEqualTo=[])
     {
         $query="SELECT ITEM_KEY,ITEM_ID,PART_NUMBER,QUANTITY,CNTR_KEY,LOCATION_IN_CNTR,INIT_TMST,LAST_LOAD_TMST,QUARANTINE_LOCKED,LOAD_USER_ID
                 FROM CGS.ITEM_INFO
@@ -335,6 +356,16 @@ class CogiscanDB2 extends Controller
         {
             $query = "$query AND LOCATION_IN_CNTR LIKE '$prod_line%'";
         }
+
+        // chequeo si hay lpns que no esten en las reservas de AMR
+        if(count($notEqualTo) > 0)
+        {
+            foreach ($notEqualTo as $key=>$item)
+            {
+                $query = "$query AND ITEM_ID <> '$item->lpn'";
+            }
+        }
+        $query = "$query FETCH FIRST 1 ROWS ONLY";
         return self::query($query);
     }
     public function getFromDefaultStorage($partNumber="")
@@ -346,6 +377,8 @@ class CogiscanDB2 extends Controller
         {
             $query = "$query AND PART_NUMBER = '$partNumber'";
         }
+
+        $query = "$query FETCH FIRST 1 ROWS ONLY";
         return self::query($query);
     }
 

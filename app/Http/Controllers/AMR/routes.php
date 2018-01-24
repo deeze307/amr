@@ -34,17 +34,40 @@ Route::get('/config/set/{field}/{type}/{valueToModify}/{value}',[
 /****************/
 
 // ***** AMR ***** //
-Route::get('/requests/getEnabledLines/{type}',[
-    'as'=>'amr.requests.getenabledlines',
-    'uses'=>'AMR\AmrController@getEnabledLines'
-]);
+Route::group([
+    'prefix'=>'requests',
+    'namespace'],
+    function(){
 
-Route::get('/requests/initamrcicle',[
-    'as'=>'amr.requests.init',
-    'uses'=>'AMR\AmrController@initAMRCicle'
-]);
+        Route::get('/getEnabledLines/{type}',[
+            'as'=>'amr.requests.getenabledlines',
+            'uses'=>'AMR\AmrController@getEnabledLines'
+        ]);
+
+        Route::get('/initamrcicle',[
+            'as'=>'amr.requests.init',
+            'uses'=>'AMR\AmrController@initAMRCicle'
+        ]);
+});
+
 
 // *************** //
+
+// ******************** //
+// ***** RESERVAS ***** //
+// ******************** //
+
+Route::group([
+    'prefix'=>'reserva',
+    'namespace'=>'AMR'],
+    function(){
+        Route::get('/all','Reservas@index');
+    }
+);
+
+// ******************** //
+// ******************** //
+
 
 //** DOCUMENTACION **//
 

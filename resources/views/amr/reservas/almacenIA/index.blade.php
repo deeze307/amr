@@ -7,22 +7,22 @@
             <th>Lpn Asignado</th>
             <th>Cantidad Solicitada</th>
             <th>Línea</th>
-            <th>Ubicación</th>
             <th>Ubicación AlmacénIA</th>
             <th>Fecha Solicitud</th>
+            <th class="text-center">Acción</th>
         </tr>
 
         </thead>
         <tbody>
         <tr ng-repeat="w in warehouse">
             <td>@{{w.op}}</td>
-            <td>@{{w.codMat}}</td>
-            <td></td>
-            <td>@{{w.cantASolic}}</td>
-            <td>@{{w.PROD_LINE}}</td>
-            <td>@{{w.MAQUINA}} @{{w.UBICACION}}</td>
-            <td></td>
+            <td>@{{w.pn}}</td>
+            <td>@{{w.lpn}}</td>
+            <td>@{{w.cantidad}}</td>
+            <td>@{{w.linea}}</td>
+            <td>@{{w.ubicacion}}</td>
             <td>@{{w.timestamp}}</td>
+            <td class="text-center"><button class="btn btn-info btn-xs">entregar</button><td>
         </tr>
         </tbody>
     </table>

@@ -46,6 +46,7 @@ class AmrController extends Controller
     {
         $output = new ConsoleOutput();
         $output->writeln("|| <fg=cyan>AMR->'initAMRCicle'</> Ejecutado | " . Carbon::now()->toDateTimeString() ." ||");
+//        self::sendEmail("pnTest","OP-TEST");
         $enabledLines = self::getEnabledLinesFormated();
         self::getAMRConfig();
         $output->writeln("<fg=yellow> - Lineas Habilitadas:</>");
@@ -117,7 +118,6 @@ class AmrController extends Controller
                 { $mat = $mat['attributes'];}
                 if ($mat['remainingBoards'] != '0')
                 {
-
                     $matArray = new \stdClass();
                     $line = preg_replace('/(^L0|^L)/','',substr($materiales['attributes']['id'],0,3));
                     $matArray->batchId = self::getPO($line);
@@ -131,26 +131,39 @@ class AmrController extends Controller
                     $matArray->remainingBoards = $mat['remainingBoards'];
                     $matArray->qtyPerLocation = self::qtyPerLocation($materiales['attributes']['id'],$mat);
                     // Chequeo si el material existe en la lista WIP y existe, si es un reemplazo habilitado
-                    if (CrudAmr::requiredInCgsWip($matArray->batchId,$matArray->partNumber))
+                    if($matArray->batchId != 'SIN-OP')
                     {
-                        //Si el material es una bandeja duplicada, no la agrego a la lista y no calculo la cantidad a pedir.
-                        if ($matArray->qtyPerLocation != null && $matArray->qtyPerLocation > 0)
+                        $batchIdPizarra = $matArray->batchId;
+                        // formateo la OP antes de procesarla ya que en EBS, las OP no tienen "-B"
+                        if(ends_with($matArray->batchId,'B'))
                         {
-                            $toRequest = self::qtyToRequest($line,$matArray->qtyPerLocation,$mat['remainingBoards'],$matArray->batchId,$mat['partNumber']);
-                            $matArray->remainingQtyToRequest = $toRequest['remainingQtyToRequest'];
-                            $matArray->qtyToRequest = $toRequest['toRequest'];
-                            $matArray->math = $toRequest['math'];
-                            $matArray->UOM = $toRequest['uom'];
-                            $matArray->operationSeq = $toRequest['operationSeq'];
-                            if ($matArray->qtyToRequest != 0)
+                            $matArray->batchId = substr($matArray->batchId,0,strlen($matArray->batchId) - 2);
+
+                        }
+
+                        // Chequeo si el partNumber solicitado existe en la OP cargada en la Línea (sin "-B")
+                        if (CrudAmr::requiredInCgsWip($matArray->batchId,$matArray->partNumber))
+                        {
+                            //Si el material es una bandeja duplicada, no la agrego a la lista y no calculo la cantidad a pedir.
+                            if ($matArray->qtyPerLocation != null && $matArray->qtyPerLocation > 0)
                             {
-                                self::checkDeltaMonitor($matArray);
+                                $toRequest = self::qtyToRequest($line,$matArray->qtyPerLocation,$mat['remainingBoards'],$batchIdPizarra,$mat['partNumber']);
+                                $matArray->remainingQtyToRequest = $toRequest['remainingQtyToRequest'];
+                                $matArray->qtyToRequest = $toRequest['toRequest'];
+                                $matArray->math = $toRequest['math'];
+                                $matArray->UOM = $toRequest['uom'];
+                                $matArray->operationSeq = $toRequest['operationSeq'];
+                                if ($matArray->qtyToRequest != 0)
+                                {
+                                    self::checkDeltaMonitor($matArray);
+                                }
                             }
                         }
                     }
                     else
                     {
-
+                        $output = new ConsoleOutput();
+                        $output->writeln('<fg=magenta>Atencion!!!</><fg=cyan>No hay OP activa en Cogiscan para la línea </>'.$matArray->laneNumber);
                     }
                 }
             }
@@ -182,16 +195,32 @@ class AmrController extends Controller
             {
                 $cogiscanDB2 = new CogiscanDB2();
                 $opParcial = $cogiscanDB2->opByComplexTool($line);
-                if($opParcial == "" || $opParcial == null)
+                if(!isset($opParcial->op) || $opParcial == "" || $opParcial == null)
                 {
                     $opParcial = 'SIN-OP';
+                    Log::debug('Linea '.$line.' sin OP');
                 }
                 else
                 {
                     $opParcial = $opParcial->op;
                 }
                 $opParcial = explode('-',$opParcial);
-                $op = $opParcial[0]."-".$opParcial[1];
+                if(count($opParcial)>2)
+                {
+                    if ($opParcial[2] == "B")
+                    {
+                        $op = $opParcial[0]."-".$opParcial[1]."-B";
+                    }
+                    else
+                    {
+                        $op = $opParcial[0]."-".$opParcial[1];
+                    }
+                }
+                else
+                {
+                    $op = $opParcial[0]."-".$opParcial[1];
+                }
+
                 $redisOp->put($op,300);
             }
             else
@@ -233,9 +262,7 @@ class AmrController extends Controller
     private static function qtyToRequest($line,$qtyPerLocation,$remainingBoards,$batchId,$partNumber)
     {
         $pizarra_dev = CrudAmr::getExpectedProdFromPizarra($batchId,$line);
-        //Obtengo la secuencia de Operacion
-        $opSeq = CrudAmr::getOperationSeq($batchId);
-        $operationSeq = $opSeq->OPERATION_SEQ_NUM;
+
 
         //Cantidad que debería usar en 3 horas de producción
         // Si no está configurado el reporte en
@@ -249,6 +276,14 @@ class AmrController extends Controller
         $shouldUse = ($qtyPerLocation * $pizarra_dev->paneles_hora) * 3;
 
         //Cantidad disponible para pedir en la OP
+        if(ends_with($batchId,'B'))
+        {
+            $batchId = substr($batchId,0,strlen($batchId) - 2);
+        }
+        //Obtengo la secuencia de Operacion
+        $opSeq = CrudAmr::getOperationSeq($batchId);
+        $operationSeq = $opSeq->OPERATION_SEQ_NUM;
+
         $cogiscan_wip = CrudAmr::chkAvailableQtyToRequest($batchId,$partNumber);
         if(count($cogiscan_wip) == 0)
         {
@@ -315,25 +350,36 @@ class AmrController extends Controller
                     //Chequeo si el material se encuentra en piso de producción para poder reservarlo
                     $onFloor = self::onFloor($material);
                     $material->ubicacionOrigen = "";
-                    switch($onFloor){
+                    switch($onFloor->ubicacionOrigen){
                         case 0:
-                            $material->ubicacionOrigen = 0; // Hay un Pedido procesado que aún no ha llegado
+                            $material->ubicacionOrigen = 0; // Hay un Pedido procesado que tal véz aún no ha llegado
                             break;
                         case 1:
-                            $material->ubicacionOrigen = 1; //
+                            $material->ubicacionOrigen = 1; // Reservas a Almacén de materiales IA
                             break;
                         case 2:
-                            $material->ubicacionOrigen = 2;
+                            $material->ubicacionOrigen = 2; // Pedidos a Interfáz de EBS
                             break;
                         case 3:
-                            $material->ubicacionOrigen = 3;
+                            $material->ubicacionOrigen = 3; // Reserva en linea de producción
                             break;
                     }
-                    $material->insertId = CrudAmr::checkMaterialRequest($material,true);
-                    if($material->insertId != 0 && $material->ubicacionOrigen == 2)
+                    if(isset($onFloor->lpn) && ($onFloor->lpn != NULL || $onFloor->lpn != ''))
                     {
-                        //Si el id de inserción es distinto a 0 inserto en la interfaz
-                        CrudAmr::insertOnEBS($material);
+                        $material->reservaLpn = $onFloor->lpn;
+                    }
+                    else
+                    {
+                        $material->reservaLpn = 'N/A';
+                    }
+                    if($material->ubicacionOrigen != 0)
+                    {
+                        $material->insertId = CrudAmr::checkMaterialRequest($material,true);
+                        if($material->insertId != 0 && $material->ubicacionOrigen == 2)
+                        {
+                            //Si el id de inserción es distinto a 0 inserto en la interfaz
+                            CrudAmr::insertOnEBS($material);
+                        }
                     }
                 }
             }
@@ -351,30 +397,40 @@ class AmrController extends Controller
      */
     private static function onFloor($material)
     {
+        // **** Para pedidos parciales **** //
         $obj = new \stdClass();
         $obj->solicitado = $material->qtyToRequest;
         $obj->transito = 0;
         $obj->almacenia = 0;
         $obj->interfaz = 0;
+        // *********************************//
 
-        $ubicacionOrigen = 2;
+        $reserva = new \stdClass(); //objeto que indica la reserva realizada
+
+        $reserva->lpn ="";
+        $reserva->ubicacionOrigen = 2; // <- por defecto la ubicación del pedido es la Interfaz de EBS
         $cogiscanDB2 = new CogiscanDB2();
         $linea = Array();
         $linea = explode('-',$material->idMaquina);
-        if (count($cogiscanDB2->getFromTransitIA($material->partNumber,$linea[0])) > 0)
+        $resTempTransit = $cogiscanDB2->getFromTransitIA($material->partNumber,$linea[0],[]);
+        $resTempWareHouse = $cogiscanDB2->getFromAlmIA($material->partNumber,[]);
+        if (count($resTempTransit) > 0)
         {
-            $ubicacionOrigen = 3;
+            $reserva->lpn = $resTempTransit[0];
+            $reserva->ubicacionOrigen = 3;
         }
-        else if(count($cogiscanDB2->getFromAlmIA($material->partNumber)) > 0)
+        else if(count($resTempWareHouse) > 0)
         {
-            $ubicacionOrigen = 1;
+            $reserva->lpn = $resTempWareHouse[0];
+            $reserva->ubicacionOrigen = 1;
         }
         else if (CrudAmr::hasRequestIncomplete($material->partNumber,$material->laneNumber))
         {
-            $ubicacionOrigen = 0;
+            $reserva->ubicacionOrigen = 0;
         }
+        Log::debug('Material '.$material->partNumber.' Reserva',[$reserva->lpn]);
 
-        return $ubicacionOrigen;
+        return $reserva;
     }
 
     public static function sendEmail($partNumber, $batchId)

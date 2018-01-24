@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 
 use IAServer\Http\Requests;
 use IAServer\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Mockery\CountValidator\Exception;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -66,7 +67,8 @@ class CrudAmr extends Controller
         try
         {
             $toReturn = 0;
-            $query = MaterialRequest::where('rawMaterial',$material->rawMaterialId)
+            $query = MaterialRequest::where('op',$material->batchId)
+                ->where('rawMaterial',$material->rawMaterialId)
                 ->where('PROD_LINE',$material->laneNumber)->first();
             if($insert)
             {
@@ -83,6 +85,7 @@ class CrudAmr extends Controller
                     $matReq->PROD_LINE = $material->laneNumber;
                     $matReq->MAQUINA = $material->idMaquina;
                     $matReq->UBICACION = $material->location;
+//                    $matReq->reserva_lpn = $material->reservaLpn;
                     $matReq->save();
                     Log::info(' +[MR]+ P#: '.$material->partNumber.' | LPN: '.$material->rawMaterialId.' | Linea '.$material->laneNumber.' MaterialRequest | ID -> '.$matReq->id);
                     $output = new ConsoleOutput();
@@ -183,14 +186,11 @@ class CrudAmr extends Controller
 //            }
             if (count($lastInsertId) > 0)
             {
-                Log::debug('Ultimo pedido para material -> '.$material.' de linea '.$line.' fue el LINEA_ID='.$lastInsertId->LINEA_ID);
                 $now = Carbon::now();
                 $lastHour = Carbon::parse($lastInsertId->LAST_UPDATE_DATE);
-                Log::debug('diferencia en horas entre '.$now.' y '.$lastHour.' es = '. $now->diffInHours($lastHour));
                 if ($now->diffInHours($lastHour) <= 2)
                 {
                     $toReturn = true;
-                    Log::debug('El ultimo pedido para el material '.$material.' de '.$line.' aun no ha sido entregado | last : '.$lastHour);
                 }
                 //LOGICA PARA CUANDO TENGAMOS LOS LPNS DEL PEDIDO
 //                $lpns = XXE_WMS_COGISCAN_PEDIDO_LPNS::WHERE('LINEA_ID',$lastInsertId->LINEA_ID)->get();
@@ -229,8 +229,8 @@ class CrudAmr extends Controller
 
     /**
      * Se checkear la cantidad disponible de un material para pedir a una OP especifica
-     * @param $batchId La OP que deseamos consultar
-     * @param $partNumber El PartNumber que deseamos consultar
+     * @param $batchId
+     * @param $partNumber
      * @return mixed
      */
     public static function chkAvailableQtyToRequest($batchId,$partNumber)
@@ -260,14 +260,40 @@ class CrudAmr extends Controller
 
     public static function getExpectedProdFromPizarra($batchId,$line)
     {
+        $lado = 1;
+        if(ends_with($batchId,'B'))
+        {
+            $lado = 2;
+        }
         $smtdatabase = SmtDataBase::where('op',$batchId)->first();
 
-        return PIZARRA_DBO_PRODUCCION::from('dbo.panel')->select('paneles_hora')
-            ->where('modelo',$smtdatabase->modelo)
-            ->where('panel',$smtdatabase->panel)
-            ->where('id_linea',$line)->first();
+        if ($lado == 2)
+        {
+            return PIZARRA_DBO_PRODUCCION::from('dbo.panel')->select('paneles_hora')
+                ->where('modelo',$smtdatabase->modelo)
+                ->where('panel',$smtdatabase->panel)
+                ->where('id_linea',$line)
+                ->where('lado',$lado)->first();
+
+        }
+        else
+        {
+            return PIZARRA_DBO_PRODUCCION::from('dbo.panel')->select('paneles_hora')
+                ->where('modelo',$smtdatabase->modelo)
+                ->where('panel',$smtdatabase->panel)
+                ->where('id_linea',$line)
+                ->where(function($query){
+                    $query->where('lado',1);
+                    $query->orWhere('lado',3);})->first();
+        }
     }
 
+    /***
+     * Chequea si el partNumber existe en la OP solicitada
+     * @param $batchId
+     * @param $partNumber
+     * @return bool
+     */
     public static function requiredInCgsWip($batchId,$partNumber)
     {
         $cgs_wip = XXE_WMS_COGISCAN_WIP::where('OP_NUMBER',$batchId)
@@ -275,7 +301,7 @@ class CrudAmr extends Controller
 
         if(count($cgs_wip) == 0)
         {
-            AmrController::sendEmail($partNumber,$batchId);
+//            AmrController::sendEmail($partNumber,$batchId);
             return false;
         }
         else
@@ -286,12 +312,92 @@ class CrudAmr extends Controller
             }
             else
             {
-                AmrController::sendEmail($partNumber,$batchId);
+//                AmrController::sendEmail($partNumber,$batchId);
                 return false;
             }
         }
     }
 
+    public static function getDeltaMonitorForTrace($material,$tipo)
+    {
+        if($tipo == 'lpn')
+        {
+            $delta = DeltaMonitor::where('rawMaterialId',$material)->get();
+        }
+        return $delta;
+    }
 
+    public static function getMaterialRequestForTrace($material,$tipo)
+    {
+
+        if ($tipo == 'lpn')
+        {
+            $materialRequest = MaterialRequest::selectRaw("
+            id,
+            op,
+            rawMaterial,
+            codMat,
+            cantASolic,
+            timestamp,
+            PROD_LINE,
+            MAQUINA,
+            UBICACION,
+            reserva_lpn,
+            ubicacionOrigen,
+            CASE ubicacionOrigen
+                WHEN '0' then 'Aguardando Pedido Anterior'
+                WHEN '1' then 'Almacén IA'
+                WHEN '2' then 'Abastecimiento'
+                WHEN '3' then 'Tránsito en la Línea'
+            END as descUbicacionOrigen")
+                ->where('rawMaterial',$material)->take(10)->get();
+        }
+        else
+        {
+            $materialRequest = MaterialRequest::selectRaw("
+            id,
+            op,
+            rawMaterial,
+            codMat,
+            cantASolic,
+            timestamp,
+            PROD_LINE,
+            MAQUINA,
+            UBICACION,
+            reserva_lpn,
+            ubicacionOrigen,
+            CASE ubicacionOrigen
+                WHEN '0' then 'Aguardando Pedido Anterior'
+                WHEN '1' then 'Almacén IA'
+                WHEN '2' then 'Abastecimiento'
+                WHEN '3' then 'Tránsito en la Línea'
+            END as descUbicacionOrigen")
+                ->where('codMat',$material)->take(10)->get();
+        }
+        return $materialRequest;
+    }
+    public static function getOnInterfaceForTrace($insertId)
+    {
+        $ebs = DB::connection('cgs_prod')->table('XXE_WMS_COGISCAN_PEDIDOS AS cp')
+            ->selectRaw("
+           cp.[LINEA_ID]
+          ,cp.[OP_NUMBER]
+          ,cp.[ITEM_CODE]
+          ,cp.[QUANTITY]
+          ,lpns.[LPN]
+          ,lpns.[QUANTITY_ASSIGNED] as 'LPN_QUANTITY'
+          ,cp.[QUANTITY_ASSIGNED]
+          ,cp.[PROD_LINE]
+          ,cp.[MAQUINA]
+          ,cp.[UBICACION]
+          ,cp.[STATUS]
+          ,cp.[ERROR_MESSAGE]
+          ,cp.[CREATION_DATE]
+          ,cp.[LAST_UPDATE_DATE]
+          ,cp.[INSERT_ID] ")
+            ->leftJoin('XXE_WMS_COGISCAN_PEDIDO_LPNS AS lpns','cp.LINEA_ID','=','lpns.LINEA_ID')
+            ->where('cp.INSERT_ID',$insertId)->take(10)->get();
+        return $ebs;
+    }
 
 }

@@ -14,7 +14,8 @@ class Partials extends Controller
 {
     public static function getPartialsOnInterface()
     {
-        $fechaDesde = Carbon::yesterday();
+//        $fechaDesde = Carbon::yesterday();
+        $fechaDesde = '2017-10-10';
         Log::debug('fecha_desde '.$fechaDesde);
         $pedidosParciales = XXE_WMS_COGISCAN_PEDIDOS::where('STATUS','ERROR')
             ->where('LAST_UPDATE_DATE','>',$fechaDesde)->get();

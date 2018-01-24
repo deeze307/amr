@@ -105,13 +105,18 @@ function(){
 
     // Trazabilidad
     Route::group([
-    'prefix' => 'amr/trazabilidad',
+    'prefix' => 'trazabilidad',
     'namespace'],
     function()
     {
         Route::get('/',[
             'as'=>'amr.trazabilidad.index',
-            'uses'=>'viewController@index'
+            'uses'=>'viewController@traceIndex'
+        ]);
+
+        Route::post('/find',[
+            'as'=>'amr.trazabilidad.find',
+            'uses'=>'Traceability@getTraceability'
         ]);
 
     });

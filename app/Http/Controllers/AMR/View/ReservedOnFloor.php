@@ -4,11 +4,11 @@ namespace IAServer\Http\Controllers\AMR\view;
 
 use Carbon\Carbon;
 use IAServer\Http\Controllers\AMR\Model\MaterialRequest;
+use IAServer\Http\Controllers\AMR\Model\Reservas;
 use Illuminate\Http\Request;
 
 use IAServer\Http\Requests;
 use IAServer\Http\Controllers\Controller;
-
 class ReservedOnFloor extends Controller
 {
 
@@ -26,7 +26,7 @@ class ReservedOnFloor extends Controller
     public static function getWareHouseAll()
     {
         $ayer = Carbon::yesterday();
-        $transit = MaterialRequest::where('ubicacionOrigen',1)
+        $transit = Reservas::where('status',1)
             ->where('timestamp','>',$ayer)
             ->orderBy('timestamp','desc')
             ->get();
