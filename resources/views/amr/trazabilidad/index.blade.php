@@ -20,7 +20,7 @@
             @if(isset($datos["deltaMonitor"]))
                 <div class="box box-success">
                     <div class="box-header with-border">
-                        <h3 class="box-title">Delta Monitor <small>(cantidad = <strong>{{count($datos["deltaMonitor"])}}</strong>)</small></h3>
+                        <h3 class="box-title">Registro de consumo para Pedido por AMR <small>(cantidad = <strong>{{count($datos["deltaMonitor"])}}</strong>)</small></h3>
                     </div>
                     <div class="box-body">
                         <table class="table table-striped table-bordered">
@@ -30,11 +30,11 @@
                                 <th>Línea</th>
                                 <th>Máquina</th>
                                 <th>Ubicación</th>
-                                <th>Part Number</th>
-                                <th>Cant. Solicitada</th>
-                                <th>LPN de Solicitud</th>
-                                <th>Placas Restantes</th>
-                                <th>Fecha Procesado</th>
+                                <th class="text-center">Part Number</th>
+                                <th class="text-center">Cant. Solicitada</th>
+                                <th class="text-center">LPN de Solicitud</th>
+                                <th class="text-center">Placas Restantes</th>
+                                <th class="text-center">Fecha Procesado</th>
                             </tr>
 
                             </thead>
@@ -44,12 +44,12 @@
                                     <td>{{$delta->batchId}}</td>
                                     <td>{{$delta->laneNumber}}</td>
                                     <td>{{$delta->idMaquina}}</td>
-                                    <td>{{$delta->location}}</td>
-                                    <td>{{$delta->partNumber}}</td>
-                                    <td>{{$delta->valueqtyPerASSYFinal}}</td>
-                                    <td>{{$delta->rawMaterialId}}</td>
-                                    <td>{{$delta->remainingBoards}}</td>
-                                    <td>{{$delta->timeStampRegistro}}</td>
+                                    <td class="text-center">{{$delta->location}}</td>
+                                    <td class="text-center">{{$delta->partNumber}}</td>
+                                    <td class="text-center">{{$delta->valueqtyPerASSYFinal}}</td>
+                                    <td class="text-center"><button class="btn btn-default btn-xs">{{$delta->rawMaterialId}}</button></td>
+                                    <td class="text-center">{{$delta->remainingBoards}}</td>
+                                    <td class="text-center">{{$delta->timeStampRegistro}}</td>
                                 </tr>
                             @endforeach
                             </tbody>
@@ -61,23 +61,23 @@
             @if(isset($datos["materialRequest"]))
                 <div class="box box-info">
                     <div class="box-header with-border">
-                        <h3 class="box-title">Material Request <small>(cantidad = <strong>{{count($datos["materialRequest"])}}</strong>)</small></h3>
+                        <h3 class="box-title">Pedidos por AMR <small>(cantidad = <strong>{{count($datos["materialRequest"])}}</strong>)</small></h3>
                     </div>
                     <div class="box-body">
                         <table class="table table-striped table-bordered">
                             <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>OP</th>
-                                <th>Línea</th>
-                                <th>LPN de Solicitud</th>
-                                <th>Material</th>
-                                <th>Cant. Pedido</th>
-                                <th>Pedido</th>
-                                <th>Máquina</th>
-                                <th>Ubicación</th>
-                                <th>LPN Reservado</th>
-                                <th>Fecha Procesado</th>
+                                <th class="text-center">OP</th>
+                                <th class="text-center">Línea</th>
+                                <th class="text-center">LPN de Solicitud</th>
+                                <th class="text-center">Material</th>
+                                <th class="text-center">Cant. Pedido</th>
+                                <th class="text-center">Pedido</th>
+                                <th class="text-center">Máquina</th>
+                                <th class="text-center">Ubicación</th>
+                                <th class="text-center">LPN Reservado</th>
+                                <th class="text-center">Fecha Procesado</th>
                             </tr>
 
                             </thead>
@@ -85,16 +85,16 @@
                             @foreach($datos["materialRequest"] as $mr)
                                 <tr>
                                     <td>{{$mr->id}}</td>
-                                    <td>{{$mr->op}}</td>
-                                    <td>{{$mr->PROD_LINE}}</td>
-                                    <td>{{$mr->rawMaterial}}</td>
-                                    <td>{{$mr->codMat}}</td>
-                                    <td>{{$mr->cantASolic}}</td>
-                                    <td>{{$mr->descUbicacionOrigen}}</td>
-                                    <td>{{$mr->MAQUINA}}</td>
-                                    <td>{{$mr->UBICACION}}</td>
-                                    <td>{{$mr->reserva_lpn}}</td>
-                                    <td>{{Carbon\Carbon::parse($mr->timestamp)->format('d/m/Y h:m:s')}}</td>
+                                    <td class="text-center">{{$mr->op}}</td>
+                                    <td class="text-center">{{$mr->PROD_LINE}}</td>
+                                    <td class="text-center"><button class="btn btn-default btn-xs">{{$mr->rawMaterial}}</button></td>
+                                    <td class="text-center">{{$mr->codMat}}</td>
+                                    <td class="text-center">{{$mr->cantASolic}}</td>
+                                    <td class="text-center">{{$mr->descUbicacionOrigen}}</td>
+                                    <td class="text-center">{{$mr->MAQUINA}}</td>
+                                    <td class="text-center">{{$mr->UBICACION}}</td>
+                                    <td class="text-center">{{$mr->reserva_lpn}}</td>
+                                    <td class="text-center">{{Carbon\Carbon::parse($mr->timestamp)->format('d/m/Y h:m:s')}}</td>
                                 </tr>
                             @endforeach
                             </tbody>
@@ -106,25 +106,25 @@
             @if(isset($datos["ebs"]))
                 <div class="box box-warning">
                     <div class="box-header with-border">
-                        <h3 class="box-title">Abastecimiento <small>(cantidad = <strong>{{count($datos["ebs"])}}</strong>)</small></h3>
+                        <h3 class="box-title">Pedidos a Abastecimiento <small>(cantidad = <strong>{{count($datos["ebs"])}}</strong>)</small></h3>
                     </div>
                     <div class="box-body">
                         <table class="table table-striped table-bordered">
                             <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>OP</th>
-                                <th>Material</th>
-                                <th>Cant. Pedido</th>
-                                <th>Asignado</th>
-                                <th>LPN Asignado</th>
-                                <th>Cant. LPN</th>
-                                <th>Máquina</th>
-                                <th>Ubicación</th>
-                                <th>Estado</th>
-                                <th>Mensaje</th>
-                                <th>Fecha Procesado</th>
-                                <th>Nro Pedido</th>
+                                <th class="text-center">OP</th>
+                                <th class="text-center">Material</th>
+                                <th class="text-center">Cant. Pedido</th>
+                                <th class="text-center">Asignado</th>
+                                <th class="text-center">LPN Asignado</th>
+                                <th class="text-center">Cant. LPN</th>
+                                <th class="text-center">Máquina</th>
+                                <th class="text-center">Ubicación</th>
+                                <th class="text-center">Estado</th>
+                                <th class="text-center">Mensaje</th>
+                                <th class="text-center">Fecha Procesado</th>
+                                <th class="text-center">Nro Pedido</th>
                             </tr>
 
                             </thead>
@@ -132,18 +132,18 @@
                             @foreach($datos["ebs"] as $ebs)
                                 <tr>
                                     <td>{{$ebs->LINEA_ID}}</td>
-                                    <td>{{$ebs->OP_NUMBER}}</td>
-                                    <td>{{$ebs->ITEM_CODE}}</td>
-                                    <td>{{$ebs->QUANTITY}}</td>
-                                    <td>{{$ebs->QUANTITY_ASSIGNED}}</td>
-                                    <td>{{$ebs->LPN}}</td>
-                                    <td>{{$ebs->LPN_QUANTITY}}</td>
-                                    <td>{{$ebs->MAQUINA}}</td>
-                                    <td>{{$ebs->UBICACION}}</td>
-                                    <td>{{$ebs->STATUS}}</td>
-                                    <td>{{$ebs->ERROR_MESSAGE}}</td>
-                                    <td>{{Carbon\Carbon::parse($ebs->CREATION_DATE)->format('d/m/Y h:m:s')}}</td>
-                                    <td>{{$ebs->INSERT_ID}}</td>
+                                    <td class="text-center">{{$ebs->OP_NUMBER}}</td>
+                                    <td class="text-center">{{$ebs->ITEM_CODE}}</td>
+                                    <td class="text-center">{{$ebs->QUANTITY}}</td>
+                                    <td class="text-center">{{$ebs->QUANTITY_ASSIGNED}}</td>
+                                    <td class="text-center">{{$ebs->LPN}}</td>
+                                    <td class="text-center">{{$ebs->LPN_QUANTITY}}</td>
+                                    <td class="text-center">{{$ebs->MAQUINA}}</td>
+                                    <td class="text-center">{{$ebs->UBICACION}}</td>
+                                    <td class="text-center">{{$ebs->STATUS}}</td>
+                                    <td class="text-center">{{$ebs->ERROR_MESSAGE}}</td>
+                                    <td class="text-center">{{Carbon\Carbon::parse($ebs->CREATION_DATE)->format('d/m/Y h:m:s')}}</td>
+                                    <td class="text-center">{{$ebs->INSERT_ID}}</td>
                                 </tr>
                             @endforeach
                             </tbody>
