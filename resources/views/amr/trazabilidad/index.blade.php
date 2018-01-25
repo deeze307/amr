@@ -61,7 +61,7 @@
             @if(isset($datos["materialRequest"]))
                 <div class="box box-info">
                     <div class="box-header with-border">
-                        <h3 class="box-title">Material Request</h3>
+                        <h3 class="box-title">Material Request <small>(cantidad = <strong>{{count($datos["materialRequest"])}}</strong>)</small></h3>
                     </div>
                     <div class="box-body">
                         <table class="table table-striped table-bordered">
@@ -70,7 +70,7 @@
                                 <th>ID</th>
                                 <th>OP</th>
                                 <th>Línea</th>
-                                <th>LPN</th>
+                                <th>LPN de Solicitud</th>
                                 <th>Material</th>
                                 <th>Cant. Pedido</th>
                                 <th>Pedido</th>
@@ -94,7 +94,7 @@
                                     <td>{{$mr->MAQUINA}}</td>
                                     <td>{{$mr->UBICACION}}</td>
                                     <td>{{$mr->reserva_lpn}}</td>
-                                    <td>{{$mr->timestamp}}</td>
+                                    <td>{{Carbon\Carbon::parse($mr->timestamp)->format('d/m/Y h:m:s')}}</td>
                                 </tr>
                             @endforeach
                             </tbody>
@@ -106,7 +106,7 @@
             @if(isset($datos["ebs"]))
                 <div class="box box-warning">
                     <div class="box-header with-border">
-                        <h3 class="box-title">Abastecimiento</h3>
+                        <h3 class="box-title">Abastecimiento <small>(cantidad = <strong>{{count($datos["ebs"])}}</strong>)</small></h3>
                     </div>
                     <div class="box-body">
                         <table class="table table-striped table-bordered">
@@ -142,7 +142,7 @@
                                     <td>{{$ebs->UBICACION}}</td>
                                     <td>{{$ebs->STATUS}}</td>
                                     <td>{{$ebs->ERROR_MESSAGE}}</td>
-                                    <td>{{$ebs->CREATION_DATE}}</td>
+                                    <td>{{Carbon\Carbon::parse($ebs->CREATION_DATE)->format('d/m/Y h:m:s')}}</td>
                                     <td>{{$ebs->INSERT_ID}}</td>
                                 </tr>
                             @endforeach

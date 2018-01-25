@@ -27,6 +27,7 @@ class Traceability extends CrudAmr
         {
             // Para Part# muestro los últimos 5 pedidos de materialRequest con sus respectivos LPN's en la interfáz
             $materialRequest=self::getMaterialRequestForTrace($material,$tipo_busqueda);
+            $ebs=[];
             if(count($materialRequest) > 0)
             {
                 $datos = compact('materialRequest');
@@ -34,12 +35,16 @@ class Traceability extends CrudAmr
                 {
                     if($mat->ubicacionOrigen == 2)
                     {
-                        $ebs = self::getOnInterfaceForTrace($mat->id);
-                        if(count($ebs) > 0)
+                        $array = self::getOnInterfaceForTrace($mat->id);
+                        foreach($array as $a)
                         {
-                            $datos = compact('materialRequest','ebs');
+                            array_push($ebs,$a);
                         }
                     }
+                }
+                if(count($ebs) > 0)
+                {
+                    $datos = compact('materialRequest','ebs');
                 }
             }
             else
@@ -59,6 +64,7 @@ class Traceability extends CrudAmr
                 $datos = compact('deltaMonitor');
             }
             $materialRequest=self::getMaterialRequestForTrace($material,$tipo_busqueda);
+            $ebs=[];
             if(count($materialRequest) > 0)
             {
                 $datos = compact('deltaMonitor','materialRequest');
@@ -66,12 +72,16 @@ class Traceability extends CrudAmr
                 {
                     if($mat->ubicacionOrigen == 2)
                     {
-                        $ebs = self::getOnInterfaceForTrace($mat->id);
-                        if(count($ebs) > 0)
+                        $array = self::getOnInterfaceForTrace($mat->id);
+                        foreach($array as $a)
                         {
-                            $datos = compact('deltaMonitor','materialRequest','ebs');
+                            array_push($ebs,$a);
                         }
                     }
+                }
+                if(count($ebs) > 0)
+                {
+                    $datos = compact('deltaMonitor','materialRequest','ebs');
                 }
             }
             else

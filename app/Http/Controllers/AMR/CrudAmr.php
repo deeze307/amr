@@ -372,7 +372,8 @@ class CrudAmr extends Controller
                 WHEN '2' then 'Abastecimiento'
                 WHEN '3' then 'Tránsito en la Línea'
             END as descUbicacionOrigen")
-                ->where('codMat',$material)->take(10)->get();
+                ->where('codMat',$material)
+                ->orderBy('timestamp','desc')->take(10)->get();
         }
         return $materialRequest;
     }
@@ -396,7 +397,8 @@ class CrudAmr extends Controller
           ,cp.[LAST_UPDATE_DATE]
           ,cp.[INSERT_ID] ")
             ->leftJoin('XXE_WMS_COGISCAN_PEDIDO_LPNS AS lpns','cp.LINEA_ID','=','lpns.LINEA_ID')
-            ->where('cp.INSERT_ID',$insertId)->take(10)->get();
+            ->where('cp.INSERT_ID',$insertId)
+            ->orderBy('CREATION_DATE','desc')->take(10)->get();
         return $ebs;
     }
 
