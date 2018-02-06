@@ -349,6 +349,11 @@ class CrudAmr extends Controller
                 WHEN '1' then 'Almacén IA'
                 WHEN '2' then 'Abastecimiento'
                 WHEN '3' then 'Tránsito en la Línea'
+                WHEN '4' then 'Entregado'
+                WHEN '5' then 'Manual a Abastecimiento'
+                WHEN '9' then 'DEFAULT STORAGE'
+                WHEN '10' then 'Reservado'
+
             END as descUbicacionOrigen")
                 ->where('rawMaterial',$material)->take(10)->get();
         }
@@ -371,6 +376,11 @@ class CrudAmr extends Controller
                 WHEN '1' then 'Almacén IA'
                 WHEN '2' then 'Abastecimiento'
                 WHEN '3' then 'Tránsito en la Línea'
+                WHEN '4' then 'Entregado'
+                WHEN '5' then 'Manual a Abastecimiento'
+                WHEN '9' then 'DEFAULT STORAGE'
+                WHEN '10' then 'Reservado'
+
             END as descUbicacionOrigen")
                 ->where('codMat',$material)
                 ->orderBy('timestamp','desc')->take(10)->get();

@@ -33,7 +33,8 @@ class Traceability extends CrudAmr
                 $datos = compact('materialRequest');
                 foreach($materialRequest as $mat)
                 {
-                    if($mat->ubicacionOrigen == 2)
+                    // Si el pedido se hizo a Abastecimiento por AMR o pedido Manual
+                    if($mat->ubicacionOrigen == 2 || $mat->ubicacionOrigen == 5)
                     {
                         $array = self::getOnInterfaceForTrace($mat->id);
                         foreach($array as $a)
@@ -70,7 +71,8 @@ class Traceability extends CrudAmr
                 $datos = compact('deltaMonitor','materialRequest');
                 foreach($materialRequest as $mat)
                 {
-                    if($mat->ubicacionOrigen == 2)
+                    // Si el pedido se hizo a Abastecimiento por AMR o pedido Manual
+                    if($mat->ubicacionOrigen == 2 || $mat->ubicacionOrigen == 5)
                     {
                         $array = self::getOnInterfaceForTrace($mat->id);
                         foreach($array as $a)
